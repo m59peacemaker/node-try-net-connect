@@ -1,0 +1,31 @@
+{
+  "name": "when-cnct-ready",
+  "version": "1.0.0",
+  "description": "Attempts a server connection and fires callback when successful.",
+  "keywords": [
+    "ping",
+    "tcp",
+    "connection",
+    "ready",
+    "wait",
+    "server",
+    "dependency",
+    "port"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/m59peacemaker/node-when-cnct-ready"
+  },
+  "author": {
+    "name": "Johnny Hauser",
+    "email": "johnnyhauser@gmail.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "tape": "^4.0.0"
+  }
+}
