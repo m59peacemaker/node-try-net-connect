@@ -18,7 +18,7 @@ module.exports = function(opts, cb) {
   function attemptConnection() {
     console.log(new Date().toISOString()+' Waiting to connect to '+service+'...');
     var client = net.connect(opts, function() {
-      client.end();
+      client.destroy();
       console.log(service+' is available.');
       cb();
     }).on('error', function(err) {
