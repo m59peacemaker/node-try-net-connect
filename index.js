@@ -1,32 +1,39 @@
-var net = require('net');
+var net = require('net')
+var EventEmitter = require('events').EventEmitter
 
 var defaults = {
-  service: 'service',
-  retry: 1000
-};
+  retry: 1000,
+  timeout: null
+}
 
-module.exports = function(opts, cb) {
-  var service = opts.service || defaults.service;
-  var shouldTimeout = false;
-  if (opts.timeout !== undefined) {
+module.exports = function(options) {
+  options = Object.assign({}, defaults, options)
+  var emitter = new EventEmitter()
+
+  var shouldTimeout = false
+  if (options.timeout) {
     setTimeout(function() {
-      shouldTimeout = true;
-    }, opts.timeout);
+      shouldTimeout = true
+    }, options.timeout)
   }
-  attemptConnection();
 
-  function attemptConnection() {
-    console.log(new Date().toISOString()+' Waiting to connect to '+service+'...');
-    var client = net.connect(opts, function() {
-      client.destroy();
-      console.log(service+' is available.');
-      cb();
+  function attemptConnection(reason) {
+    emitter.emit('retry', reason)
+    var client = net.connect(options, function() {
+      client.destroy()
+      emitter.emit('connected')
     }).on('error', function(err) {
       if (shouldTimeout) {
-        cb(service+' could not be reached in '+opts.timeout+'ms. '+err.toString());
+        emitter.emit('timeout', err)
       } else {
-        setTimeout(attemptConnection, opts.retry || defaults.retry);
+        setTimeout(function() {
+          attemptConnection(err)
+        }, options.retry)
       }
-    });
+    })
   }
-};
+
+  attemptConnection()
+
+  return emitter
+}

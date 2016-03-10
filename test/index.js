@@ -1,45 +1,34 @@
-var test = require('tape');
-var whenCnctReady = require('../');
-var http = require('http');
-var testPort = 9999;
+var test = require('tape')
+var whenCnctReady = require('../')
+var http = require('http')
+var testPort = 9999
+var Promise = require('bluebird')
 
-var server = http.createServer(function(req, res) { res.end(); });
+function Server() {
+  return http.createServer(function(req, res) { res.end() })
+}
 
-test('fires cb when connected', function(t) {
-  t.plan(1);
+test('emits "connected" when connected', function(t) {
+  t.plan(1)
+  var server = Server()
   server.listen(testPort, function() {
-    whenCnctReady({port: testPort, timeout: 1000}, function(err) {
-      server.close();
-      t.false(err);
-    });
-  });
-});
+    whenCnctReady({port: testPort, timeout: 1000}).on('connected', function() {
+      server.close(function() {
+        t.pass()
+      })
+    })
+  })
+})
 
-test('fires cb with err when timed out', function(t) {
-  t.plan(1);
-  whenCnctReady({port: testPort, retry: 40, timeout: 100}, function(err) {
-    t.true(err);
-  });
-});
+test('emits "timeout" when timed out', function(t) {
+  t.plan(1)
+  whenCnctReady({port: testPort, retry: 40, timeout: 100}).on('timeout', t.pass)
+})
 
-test('attempts connection at set interval', function(t) {
-  t.plan(1);
-  var tries = 0;
-  oldLog = console.log;
-  console.log = function() { ++tries; };
-  whenCnctReady({port: testPort, retry: 10, timeout: 100}, function() {
-    console.log = oldLog;
-    t.equal(tries, 10);
-  });
-});
-
-test('uses service name in logs', function(t) {
-  t.plan(1);
-  var service = 'MyService';
-  var oldLog = console.log;
-  console.log = function(msg) {
-    console.log = oldLog;
-    t.true(~msg.indexOf(service));
-  };
-  whenCnctReady({port: testPort, retry: 10000, timeout: 0, service: service}, function() {});
-});
+test('emits "retry" with connection error message', function(t) {
+  t.plan(3)
+  whenCnctReady({port: testPort, retry: 10, timeout: 30})
+  .on('retry', function(reason) {
+    t.true(reason)
+  })
+})
