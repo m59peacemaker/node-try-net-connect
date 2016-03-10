@@ -22,8 +22,8 @@ whenCnctReady({
 See node's [net.connect](https://nodejs.org/api/net.html#net_net_connect_options_connectionlistener) parameters for connection options.
 
 - `options: object`
-  - `retry: `number, 1000` ms to wait before retrying connection
-  - `timeout: `number, null` ms to continue retrying before timing out
+  - `retry:   number, 1000` ms to wait before retrying connection
+  - `timeout: number, null` ms to continue retrying before timing out
 - **returns**: `eventEmitter`
   - `.on('connected', function() {})`
   - `.on('retry',     function(reason) {})`
