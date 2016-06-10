@@ -1,13 +1,16 @@
 {
-  "name": "when-cnct-ready",
+  "name": "try-net-connect",
   "version": "2.0.1",
-  "description": "Attempts a server connection and fires callback when successful.",
+  "description": "Polls a network socket ",
   "keywords": [
     "ping",
     "tcp",
+    "network",
     "connection",
     "ready",
     "wait",
+    "retry",
+    "timeout",
     "server",
     "dependency",
     "port"
@@ -18,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/m59peacemaker/node-when-cnct-ready"
+    "url": "https://github.com/m59peacemaker/node-try-net-connect"
   },
   "author": {
     "name": "Johnny Hauser",

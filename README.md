@@ -1,4 +1,4 @@
-# when-cnct-ready
+# try-net-connect
 
 I use this in my startup scripts executed in Docker containers so that I can wait for another container's server to be ready before starting the dependent server.
 
@@ -9,7 +9,9 @@ npm install when-cnct-ready
 
 ## Usage
 ```javascript
-whenCnctReady({
+const tryConnect = require('try-net-connect')
+
+tryConnect({
   host: process.env.HOST,
   port: process.env.PORT
 }).on('connected', win)
@@ -17,7 +19,7 @@ whenCnctReady({
   .on('timeout', feelBad)
 ```
 
-## whenCnctReady(options)
+## tryConnect(options)
 
 See node's [net.connect](https://nodejs.org/api/net.html#net_net_connect_options_connectionlistener) parameters for connection options.
 
@@ -25,6 +27,6 @@ See node's [net.connect](https://nodejs.org/api/net.html#net_net_connect_options
   - `retry:   number, 1000` ms to wait before retrying connection
   - `timeout: number, null` ms to continue retrying before timing out
 - **returns**: `eventEmitter`
-  - `.on('connected', function() {})`
+  - `.on('connected', function(client) {})`
   - `.on('retry',     function(reason) {})`
   - `.on('timeout',   function() {})`
