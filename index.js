@@ -1,39 +1,40 @@
 var net = require('net')
 var EventEmitter = require('events').EventEmitter
+var retry = require('retry')
 
 var defaults = {
   retry: 1000,
-  timeout: null
+  retries: null
 }
 
-module.exports = function(options) {
+module.exports = options => {
   options = Object.assign({}, defaults, options)
+  const retryOptions = {
+    forever: true,
+    factor: 0,
+    retries: options.retries
+  }
+  if (Boolean(options.retries)) {
+    retryOptions.forever = false
+    retryOptions.minTimeout = options.retry
+    retryOptions.maxTimeout = options.retry
+  }
+
   var emitter = new EventEmitter()
 
-  var shouldTimeout = false
-  if (options.timeout) {
-    setTimeout(function() {
-      shouldTimeout = true
-    }, options.timeout)
-  }
+  var operation = retry.operation(retryOptions)
 
-  function attemptConnection(reason) {
-    emitter.emit('retry', reason)
-    var client = net.connect(options, function() {
+  operation.attempt(currentAttempt => {
+    var client = net.connect(options, () => {
       client.destroy()
-      emitter.emit('connected')
-    }).on('error', function(err) {
-      if (shouldTimeout) {
-        emitter.emit('timeout', err)
-      } else {
-        setTimeout(function() {
-          attemptConnection(err)
-        }, options.retry)
+      emitter.emit('connected', client)
+    }).on('error', err => {
+      if (operation.retry(err)) {
+        return emitter.emit('retry', err)
       }
+      emitter.emit('timeout', operation.mainError())
     })
-  }
-
-  attemptConnection()
+  })
 
   return emitter
 }

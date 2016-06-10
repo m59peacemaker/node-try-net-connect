@@ -4,7 +4,7 @@ I use this in my startup scripts executed in Docker containers so that I can wai
 
 ## Install
 ```
-npm install when-cnct-ready
+npm install try-net-connect
 ```
 
 ## Usage
@@ -25,8 +25,8 @@ See node's [net.connect](https://nodejs.org/api/net.html#net_net_connect_options
 
 - `options: object`
   - `retry:   number, 1000` ms to wait before retrying connection
-  - `timeout: number, null` ms to continue retrying before timing out
+  - `retries: number, null (infinite)` number of retries
 - **returns**: `eventEmitter`
-  - `.on('connected', function(client) {})`
-  - `.on('retry',     function(reason) {})`
-  - `.on('timeout',   function() {})`
+  - `.on('connected', client => {})`
+  - `.on('retry',     reason => {})`
+  - `.on('timeout',   mainReason => {})`
