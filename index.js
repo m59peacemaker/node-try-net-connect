@@ -11,30 +11,32 @@ module.exports = options => {
   options = Object.assign({}, defaults, options)
   const retryOptions = {
     forever: true,
-    factor: 0,
-    retries: options.retries
+    retries: options.retries,
+    minTimeout: options.retry,
+    maxTimeout: options.retry
   }
-  if (Boolean(options.retries)) {
+
+  if (typeof options.retries === 'number'  && options.retries > 0) {
     retryOptions.forever = false
-    retryOptions.minTimeout = options.retry
-    retryOptions.maxTimeout = options.retry
   }
 
   var emitter = new EventEmitter()
 
   var operation = retry.operation(retryOptions)
 
+  let shouldStop = false
   operation.attempt(currentAttempt => {
     var client = net.connect(options, () => {
       client.destroy()
       emitter.emit('connected', client)
     }).on('error', err => {
-      if (operation.retry(err)) {
+      if (!shouldStop && operation.retry(err)) {
         return emitter.emit('retry', err)
       }
       emitter.emit('timeout', operation.mainError())
     })
   })
 
+  emitter.stop = () => shouldStop = true
   return emitter
 }
