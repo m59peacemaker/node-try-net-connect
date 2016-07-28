@@ -30,7 +30,8 @@ module.exports = options => {
       client.destroy()
       emitter.emit('connected', client)
     }).on('error', err => {
-      if (!shouldStop && operation.retry(err)) {
+      if (shouldStop) { return } // done
+      if (operation.retry(err)) {
         return emitter.emit('retry', err)
       }
       emitter.emit('timeout', operation.mainError())

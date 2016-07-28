@@ -30,3 +30,4 @@ See node's [net.connect](https://nodejs.org/api/net.html#net_net_connect_options
   - `.on('connected', client => {})`
   - `.on('retry',     reason => {})`
   - `.on('timeout',   mainReason => {})`
+  - `stop: function` stop retrying
