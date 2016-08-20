@@ -1,8 +1,8 @@
-var net = require('net')
-var EventEmitter = require('events').EventEmitter
-var retry = require('retry')
+const net = require('net')
+const {EventEmitter} = require('events')
+const retry = require('retry')
 
-var defaults = {
+const defaults = {
   retry: 1000,
   retries: null
 }
@@ -20,17 +20,15 @@ module.exports = options => {
     retryOptions.forever = false
   }
 
-  var emitter = new EventEmitter()
+  const emitter = new EventEmitter()
 
-  var operation = retry.operation(retryOptions)
+  const operation = retry.operation(retryOptions)
 
-  let shouldStop = false
   operation.attempt(currentAttempt => {
-    var client = net.connect(options, () => {
+    const client = net.connect(options, () => {
       client.destroy()
       emitter.emit('connected', client)
     }).on('error', err => {
-      if (shouldStop) { return } // done
       if (operation.retry(err)) {
         return emitter.emit('retry', err)
       }
@@ -38,6 +36,6 @@ module.exports = options => {
     })
   })
 
-  emitter.stop = () => shouldStop = true
+  emitter.stop = () => operation.stop()
   return emitter
 }

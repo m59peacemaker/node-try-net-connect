@@ -1,6 +1,6 @@
 {
   "name": "try-net-connect",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Polls a network socket ",
   "keywords": [
     "ping",
@@ -32,6 +32,6 @@
     "tape": "^4.0.0"
   },
   "dependencies": {
-    "retry": "^0.9.0"
+    "retry": "^0.10.0"
   }
 }
